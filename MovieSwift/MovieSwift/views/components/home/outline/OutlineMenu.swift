@@ -49,6 +49,7 @@ enum OutlineMenu: Int, CaseIterable, Identifiable {
     
     private func moviesList(menu: MoviesMenu) -> some View {
         NavigationView{ MoviesHomeList(menu: .constant(menu),
+                                       sortMode: .constant(.default),
                                        pageListener: MoviesMenuListPageListener(menu: menu)) }
     }
     

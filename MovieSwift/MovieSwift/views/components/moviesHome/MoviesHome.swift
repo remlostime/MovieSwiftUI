@@ -10,6 +10,16 @@ import SwiftUI
 import Combine
 import SwiftUIFlux
 
+enum SortMode: String, CaseIterable, Identifiable {
+    var id: String {
+        self.rawValue
+    }
+    
+    case `default`
+    case time
+    case name
+}
+
 struct MoviesHome : View {
     private enum HomeMode {
         case list, grid
@@ -25,6 +35,7 @@ struct MoviesHome : View {
     @StateObject private var selectedMenu = MoviesSelectedMenuStore(selectedMenu: MoviesMenu.allCases.first!)
     @State private var isSettingPresented = false
     @State private var homeMode = HomeMode.list
+    @State private var sortMode: SortMode = .default
         
     private var settingButton: some View {
         Button(action: {
@@ -46,6 +57,15 @@ struct MoviesHome : View {
         }
     }
     
+    private var sortButton: some View {
+        Picker.init("Sort", selection: $sortMode) {
+            ForEach.init(SortMode.allCases) { sortMode in
+                Text.init(sortMode.rawValue)
+                    .tag(sortMode)
+            }
+        }
+    }
+    
     @ViewBuilder
     private var homeAsList: some View {
         TabView(selection: $selectedMenu.menu) {
@@ -55,6 +75,7 @@ struct MoviesHome : View {
                         .tag(menu)
                 } else {
                     MoviesHomeList(menu: .constant(menu),
+                                   sortMode: .constant(sortMode),
                                    pageListener: selectedMenu.pageListener)
                         .tag(menu)
                 }
@@ -82,6 +103,7 @@ struct MoviesHome : View {
             .navigationBarTitleDisplayMode(homeMode == .list ? .inline : .automatic)
             .navigationBarItems(trailing:
                                     HStack {
+                                        sortButton
                                         swapHomeButton
                                         settingButton
                                     }
